@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Menu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0a2647, #2c83c3);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(18, 63, 122, 0.37);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 25px;
+      width: 90%;
+      max-width: 500px;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .menu-heading {
+      text-align: center;
+      font-size: 2.5rem;
+      margin: 0 0 30px 0;
+      color: white;
+      text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      position: relative;
+      padding-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+
+    .menu-heading::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 2px;
+    }
+
+    .button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 18px;
+      margin: 12px 0;
+      font-size: 18px;
+      background: linear-gradient(135deg, #2c83c3, #0a2647);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .button i {
+      margin-right: 15px;
+      font-size: 1.2em;
+      width: 25px;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      background: linear-gradient(135deg, #3a93d3, #1a3467);
+    }
+
+    .sub-buttons {
+      display: none;
+      padding: 10px 0;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .sub-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      color: #2c3e50;
+      margin: 0;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      min-height: 60px;
+      cursor: pointer;
+    }
+
+    .sub-button i {
+      margin-right: 10px;
+      font-size: 1.1em;
+    }
+
+    .sub-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      background: #f8f9fa;
+    }
+
+    .show {
+      display: grid;
+    }
+
+    .carousel {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+    }
+
+    .carousel-container {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 600px;
+      max-height: 80vh;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 40px;
+      overflow: hidden;
+    }
+
+    .carousel-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 30px;
+      color: #e74c3c;
+      cursor: pointer;
+      z-index: 2;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .carousel-close:hover {
+      color: #c0392b;
+      transform: scale(1.1);
+    }
+
+    .carousel-title {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 25px;
+      font-size: 1.8em;
+      padding: 0 20px;
+    }
+
+    .carousel-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .carousel-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px;
+      border-radius: 8px;
+      background: rgba(44, 131, 195, 0.1);
+      animation: fadeIn 0.3s ease-out forwards;
+      opacity: 0;
+    }
+
+    .carousel-item:nth-child(even) {
+      background: rgba(44, 131, 195, 0.05);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .item-desc {
+      color: #2c3e50;
+      font-weight: 500;
+    }
+
+    .item-price {
+      color: #2c83c3;
+      font-weight: 600;
+    }
+
+    /* Custom scrollbar */
+    .carousel-items::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .carousel-items::-webkit-scrollbar-track {
+      background: rgba(44, 131, 195, 0.1);
+      border-radius: 4px;
+    }
+
+    .carousel-items::-webkit-scrollbar-thumb {
+      background: #2c83c3;
+      border-radius: 4px;
+    }
+
+    .carousel-items::-webkit-scrollbar-thumb:hover {
+      background: #1a3467;
+    }
+
+    @media (max-width: 600px) {
+      .menu-heading {
+        font-size: 2rem;
+      }
+
+      .button {
+        font-size: 16px;
+        padding: 16px;
+      }
+
+      .sub-button {
+        font-size: 14px;
+      }
+
+      .carousel-container {
+        width: 90%;
+        padding: 25px;
+        max-height: 90vh;
+      }
+
+      .carousel-title {
+        font-size: 1.5em;
+      }
+
+      .carousel-items {
+        max-height: 70vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-card">
+    <h1 class="menu-heading">Explore Our Menu</h1>
+    
+    <button class="button" onclick="toggleSubButtons('klubSubButtons')">
+      <i class="fas fa-cocktail"></i>Klub
+    </button>
+    <div id="klubSubButtons" class="sub-buttons">
+      <button class="sub-button" onclick="showCarousel('Beers')"><i class="fas fa-beer"></i>Beers</button>
+      <button class="sub-button" onclick="showCarousel('Vodkas')"><i class="fas fa-wine-bottle"></i>Vodkas</button>
+      <button class="sub-button" onclick="showCarousel('Gins')"><i class="fas fa-glass-martini"></i>Gins</button>
+      <button class="sub-button" onclick="showCarousel('Whisky')"><i class="fas fa-whiskey-glass"></i>Whisky</button>
+      <button class="sub-button" onclick="showCarousel('Brandy')"><i class="fas fa-glass-whiskey"></i>Brandy</button>
+      <button class="sub-button" onclick="showCarousel('Tequila')"><i class="fas fa-cactus"></i>Tequila</button>
+      <button class="sub-button" onclick="showCarousel('Wine')"><i class="fas fa-wine-glass"></i>Wine</button>
+      <button class="sub-button" onclick="showCarousel('Cognac')"><i class="fas fa-gem"></i>Cognac</button>
+      <button class="sub-button" onclick="showCarousel('Rum')"><i class="fas fa-umbrella-beach"></i>Rum</button>
+    </div>
+
+    <button class="button" onclick="toggleSubButtons('restaurantSubButtons')">
+      <i class="fas fa-utensils"></i>Restaurant
+    </button>
+    <div id="restaurantSubButtons" class="sub-buttons">
+      <button class="sub-button" onclick="showCarousel('Beverages')"><i class="fas fa-coffee"></i>Beverages</button>
+      <button class="sub-button" onclick="showCarousel('Drinks')"><i class="fas fa-cocktail"></i>Drinks</button>
+      <button class="sub-button" onclick="showCarousel('Snacks')"><i class="fas fa-cookie"></i>Snacks</button>
+      <button class="sub-button" onclick="showCarousel('Main Dishes')"><i class="fas fa-drumstick"></i>Main Dishes</button>
+      <button class="sub-button" onclick="showCarousel('Sides')"><i class="fas fa-plate-wheat"></i>Sides</button>
+    </div>
+
+    <button class="button" onclick="toggleSubButtons('loungeSubButtons')">
+      <i class="fas fa-bed"></i>Lounge
+    </button>
+    <div id="loungeSubButtons" class="sub-buttons">
+      <button class="sub-button" onclick="showCarousel('Standard Rooms')"><i class="fas fa-door-open"></i>Standard Rooms</button>
+      <button class="sub-button" onclick="showCarousel('Executive Rooms')"><i class="fas fa-door-closed"></i>Executive Rooms</button>
+      <button class="sub-button" onclick="showCarousel('VIP Suites')"><i class="fas fa-crown"></i>VIP Suites</button>
+      <button class="sub-button" onclick="showCarousel('Lounge Packages')"><i class="fas fa-gift"></i>Packages</button>
+    </div>
+
+    <button class="button" onclick="toggleSubButtons('conferenceSubButtons')">
+      <i class="fas fa-users"></i>Conference
+    </button>
+    <div id="conferenceSubButtons" class="sub-buttons">
+      <button class="sub-button" onclick="showCarousel('Conference Rooms')"><i class="fas fa-door-open"></i>Rooms</button>
+      <button class="sub-button" onclick="showCarousel('Conference Equipment')"><i class="fas fa-tv"></i>Equipment</button>
+      <button class="sub-button" onclick="showCarousel('Conference Services')"><i class="fas fa-concierge-bell"></i>Services</button>
+    </div>
+
+    <button class="button" onclick="toggleSubButtons('laundrySubButtons')">
+      <i class="fas fa-soap"></i>Laundry
+    </button>
+    <div id="laundrySubButtons" class="sub-buttons">
+      <button class="sub-button" onclick="showCarousel('Laundry Services')"><i class="fas fa-soap"></i>Services</button>
+      <button class="sub-button" onclick="showCarousel('Laundry Pricing')"><i class="fas fa-tag"></i>Pricing</button>
+      <button class="sub-button" onclick="showCarousel('Laundry Specials')"><i class="fas fa-star"></i>Specials</button>
+    </div>
+  </div>
+
+  <div class="carousel" id="carousel">
+    <span class="carousel-close" onclick="hideCarousel()">×</span>
+    <div class="carousel-container">
+      <div class="carousel-slides" id="carouselSlides"></div>
+    </div>
+  </div>
+
+  <script>
+    const categoryData = {
+      "Klub": {
+        "Beers": [["White Cap", "250.00"],["Tusker Lager", "250.00"], ["Tusker Lite", "250.00"],["Tusker Malt", "250.00"],["Tusker Cider", "250.00"],
+        ["Balozi Lager", "250.00"],["Guinness", "300.00"],["Heineken", "300.00"],["Savanna Dry Cider", "350.00"],["Hunters Dry Cider", "300.00"]],
+        "Vodkas": [["Kibao 250ml", "400.00"],["Kibao 750ml", "1,000.00"],["Best 250ml", "400.00"],["Best 750ml", "1,200.00"],
+        ["Chrome 250ml", "400.00"],["Chrome 750ml", "1,200.00"],["Kenya Cane 250ml", "350.00"],["Kenya Cane 750ml", "1,000.00"]],
+        "Gins": [["Best 250ml", "400.00"], ["Best 750ml", "1,200.00"],["Kibao 250ml", "350.00"], ["Kibao 750ml", "1,000.00"],
+        ["Gordon 350ml", "1,500.00"], ["Gordon 750ml", "2,700.00"],["Gilbeys 250ml", "600.00"], ["Gilbeys 350ml", "900.00"]],
+        "Whisky": [["Best 250ml", "400.00"],["Best 750ml", "1200.00"],["VAT 69 350ml", "1,000.00"],["VAT 69 750ml", "2,500.00"],
+        ["Black & White 350ml", "900.00"],["Black & White 750ml", "1,800.00"],["JW Red 350ml", "1,500.00"],["JW Red 750ml", "3,000.00"]],
+        "Brandy": [["County 250ml", "350.00"],["County 750ml", "1,000.00"],["Viceroy 250ml", "700.00"],["Viceroy 350ml", "1,000.00"],
+        ["Richot 250ml", "600.00"],["Richot 350ml", "900.00"],["Richot 750ml", "1,800.00"]],
+        "Tequila": [["Olmeca", "900.00"], ["Don Julio", "1500.00"]],
+        "Wine": [["Caprice Sweet Red", "1,000.00"], ["Caprice Sweet White", "1,000.00"],["Caprice Dry Red", "1,000.00"],
+        ["Caprice Dry White", "1,000.00"],["Drostdy Hof Red Claret", "1,800.00"]],
+        "Cognac": [["Hennessy", "2000.00"], ["Courvoisier", "1800.00"]],
+        "Rum": [["Captain Morgan", "600.00"], ["Bacardi", "650.00"]]
+      },
+      "Restaurant": {
+        "Beverages": [["Tea", "50.00"], ["Coffee", "70.00"]],
+        "Drinks": [["Fresh Juice", "120.00"], ["Soda", "50.00"]],
+        "Snacks": [["Samosa", "30.00"], ["Mandazi", "20.00"]],
+        "Main Dishes": [["Chicken Stew", "300.00"], ["Beef Fry", "350.00"]],
+        "Sides": [["Chips", "100.00"], ["Ugali", "50.00"]]
+      },
+      "Lounge": {
+        "Standard Rooms": [["Day Rate (8hrs)", "2,500.00"], ["Overnight", "4,000.00"]],
+        "Executive Rooms": [["Day Rate (8hrs)", "3,500.00"], ["Overnight", "6,000.00"]],
+        "VIP Suites": [["Day Rate (8hrs)", "5,000.00"], ["Overnight", "8,000.00"]],
+        "Lounge Packages": [["Standard Package", "10,000.00"], ["Premium Package", "15,000.00"]]
+      },
+      "Conference": {
+        "Conference Rooms": [["Small Room", "5,000.00"], ["Large Room", "10,000.00"]],
+        "Conference Equipment": [["Projector", "1,000.00"], ["Sound System", "2,000.00"]],
+        "Conference Services": [["Catering", "500/person"], ["Secretarial", "2,000.00"]]
+      },
+      "Laundry": {
+        "Laundry Services": [["Wash & Fold", "300.00"], ["Dry Cleaning", "500.00"]],
+        "Laundry Pricing": [["Shirt", "150.00"], ["Suit", "400.00"]],
+        "Laundry Specials": [["Bulk Discount", "20% off"], ["Express Service", "+50% fee"]]
+      }
+    };
+
+    function showCarousel(subCategory) {
+      const mainCategory = event.target.closest('.sub-buttons').previousElementSibling
+        .querySelector('i').nextSibling.textContent.trim();
+      
+      const container = document.getElementById("carouselSlides");
+      container.innerHTML = `
+        <h3 class="carousel-title">${subCategory}</h3>
+        <div class="carousel-items">
+          ${categoryData[mainCategory][subCategory].map(([desc, price], index) => `
+            <div class="carousel-item" style="animation-delay: ${index * 50}ms">
+              <span class="item-desc">${desc}</span>
+              <span class="item-price">Ksh ${price}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      // Scroll to top and show
+      container.querySelector('.carousel-items').scrollTop = 0;
+      document.getElementById("carousel").style.display = "block";
+    }
+
+    function hideCarousel() {
+      document.getElementById("carousel").style.display = "none";
+    }
+
+    function toggleSubButtons(id) {
+      document.getElementById(id).classList.toggle("show");
+    }
+
+    // Close when clicking outside carousel
+    document.getElementById('carousel').addEventListener('click', function(e) {
+      if(e.target === this) hideCarousel();
+    });
+  </script>
+</body>
+</html>
